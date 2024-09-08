@@ -40,7 +40,6 @@ def main():
 
     processor = ArtworkProcessor()
     if command:
-        log(f'Das Kommand {command}')
         if command.get('dbid') and command.get('mediatype'):
             items = []
             id_items = command.get('dbid')
@@ -151,10 +150,6 @@ def get_command():
         # 'dbid' sarà una lista di valori
         dbid_list = parsed_params.get('dbid', [])
         mediatype = parsed_params.get('mediatype', [''])[0]
-
-        # Mostra i valori estratti
-        print(f"DBIDs: {dbid_list}")
-        print(f"Mediatype: {mediatype}")
         command['dbid'] = dbid_list
         command['mediatype'] = mediatype
 
