@@ -1,5 +1,5 @@
 import sys
-from urllib.parse import parse_qsl
+from urllib.parse import parse_qsl, parse_qs
 
 import xbmc
 import xbmcgui
@@ -40,9 +40,17 @@ def main():
 
     processor = ArtworkProcessor()
     if command:
+        log(f'Das Kommand {command}')
         if command.get('dbid') and command.get('mediatype'):
-            item = quickjson.get_item_details(int(command.get('dbid')), command.get('mediatype'))
-            processor.process_list((info.MediaItem(item),), True)
+            items = []
+            id_items = command.get('dbid')
+            for id_item in id_items:
+                item = quickjson.get_item_details(int(id_item), command.get('mediatype'))
+                media_item = info.MediaItem(item)
+                if media_item not in items:
+                    items.append(media_item)
+            in_tuple = tuple(items)
+            processor.process_list(in_tuple, True)
             return
     if processor.processor_busy:
         options = [(L(M.STOP), 'CancelCurrent')]
@@ -137,7 +145,18 @@ def get_command():
     command = {}
     params_string = sys.argv[1]
     if params_string:
-        command = dict(parse_qsl(params_string[1:]))
+        # Estrai i parametri dalla query string
+        parsed_params = parse_qs(params_string.lstrip('?'))
+
+        # 'dbid' sarà una lista di valori
+        dbid_list = parsed_params.get('dbid', [])
+        mediatype = parsed_params.get('mediatype', [''])[0]
+
+        # Mostra i valori estratti
+        print(f"DBIDs: {dbid_list}")
+        print(f"Mediatype: {mediatype}")
+        command['dbid'] = dbid_list
+        command['mediatype'] = mediatype
 
     return command
 
