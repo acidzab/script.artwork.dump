@@ -1,3 +1,6 @@
+import sys
+from urllib.parse import parse_qsl
+
 import xbmc
 import xbmcgui
 
@@ -5,7 +8,8 @@ from artworkprocessor import ArtworkProcessor
 from filemanager import FileManager
 from libs import mediainfo as info, mediatypes, pykodi, quickjson, utils
 from libs.addonsettings import settings
-from libs.pykodi import check_utf8, localize as L
+from libs.pykodi import check_utf8, localize as L, log
+
 
 class M(object):
     STOP = 32403
@@ -32,8 +36,14 @@ class M(object):
 def main():
     settings.update_settings()
     mediatypes.update_settings()
+    command = get_command()
 
     processor = ArtworkProcessor()
+    if command:
+        if command.get('dbid') and command.get('mediatype'):
+            item = quickjson.get_item_details(int(command.get('dbid')), command.get('mediatype'))
+            processor.process_list((info.MediaItem(item),), True)
+            return
     if processor.processor_busy:
         options = [(L(M.STOP), 'CancelCurrent')]
     else:
@@ -120,6 +130,17 @@ def runon_medialist(function, heading, medialist='videos', typelabel=None, fg=Fa
     info.clear_cache()
     progress.close()
     return fixcount
+
+
+def get_command():
+    # Leggi i parametri passati
+    command = {}
+    params_string = sys.argv[1]
+    if params_string:
+        command = dict(parse_qsl(params_string[1:]))
+
+    return command
+
 
 if __name__ == '__main__':
     main()
