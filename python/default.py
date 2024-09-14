@@ -49,7 +49,7 @@ def main():
                 if media_item not in items:
                     items.append(media_item)
             in_tuple = tuple(items)
-            processor.process_list(in_tuple, True)
+            processor.process_list(in_tuple)
             return
     if processor.processor_busy:
         options = [(L(M.STOP), 'CancelCurrent')]
