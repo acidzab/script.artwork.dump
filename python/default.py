@@ -142,7 +142,7 @@ def runon_medialist(function, heading, medialist='videos', typelabel=None, fg=Fa
 def get_command():
     # Leggi i parametri passati
     command = {}
-    params_string = sys.argv[1]
+    params_string = sys.argv[1] if len(sys.argv) > 1 else None
     if params_string:
         # Estrai i parametri dalla query string
         parsed_params = parse_qs(params_string.lstrip('?'))
